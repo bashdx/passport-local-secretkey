@@ -1,7 +1,7 @@
 {
-  "name": "passport-local",
+  "name": "passport-local-secret-key",
   "version": "1.0.0",
-  "description": "Local username and password authentication strategy for Passport.",
+  "description": "Local username, password and secret key authentication strategy for Passport.",
   "keywords": [
     "passport",
     "local",
@@ -9,7 +9,8 @@
     "authn",
     "authentication",
     "username",
-    "password"
+    "password",
+    "secret key"
   ],
   "author": {
     "name": "Jared Hanson",
@@ -35,15 +36,15 @@
     "passport-strategy": "1.x.x"
   },
   "devDependencies": {
-    "make-node": "0.4.6",
-    "mocha": "2.x.x",
     "chai": "2.x.x",
-    "chai-passport-strategy": "0.1.x"
+    "chai-passport-strategy": "0.1.x",
+    "make-node": "0.4.6",
+    "mocha": "^8.2.1"
   },
   "engines": {
     "node": ">= 0.4.0"
   },
   "scripts": {
-    "test": "make test"
+    "test": "mocha --file test/bootstrap/node.js"
   }
 }

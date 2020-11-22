@@ -8,8 +8,8 @@ var chai = require('chai')
 describe('Strategy', function() {
     
   describe('handling a request with valid credentials in body', function() {
-    var strategy = new Strategy(function(username, password, done) {
-      if (username == 'johndoe' && password == 'secret') {
+    var strategy = new Strategy(function(username, password, secretKey, done) {
+      if (username == 'johndoe' && password == 'secret' && secretKey == 'secret key') {
         return done(null, { id: '1234' }, { scope: 'read' });
       }
       return done(null, false);
@@ -29,6 +29,7 @@ describe('Strategy', function() {
           req.body = {};
           req.body.username = 'johndoe';
           req.body.password = 'secret';
+          req.body.secretkey = 'secret key';
         })
         .authenticate();
     });
@@ -45,8 +46,8 @@ describe('Strategy', function() {
   });
   
   describe('handling a request with valid credentials in query', function() {
-    var strategy = new Strategy(function(username, password, done) {
-      if (username == 'johndoe' && password == 'secret') {
+    var strategy = new Strategy(function(username, password, secretKey, done) {
+      if (username == 'johndoe' && password == 'secret' && secretKey == 'secret key') {
         return done(null, { id: '1234' }, { scope: 'read' });
       }
       return done(null, false);
@@ -66,6 +67,7 @@ describe('Strategy', function() {
           req.query = {};
           req.query.username = 'johndoe';
           req.query.password = 'secret';
+          req.query.secretkey = 'secret key';
         })
         .authenticate();
     });
@@ -82,7 +84,7 @@ describe('Strategy', function() {
   });
   
   describe('handling a request without a body', function() {
-    var strategy = new Strategy(function(username, password, done) {
+    var strategy = new Strategy(function(username, password, secretKey, done) {
       throw new Error('should not be called');
     });
     
@@ -100,13 +102,13 @@ describe('Strategy', function() {
     
     it('should fail with info and status', function() {
       expect(info).to.be.an.object;
-      expect(info.message).to.equal('Missing credentials');
+      expect(info.message).to.equal('Missing credentials or secret key');
       expect(status).to.equal(400);
     });
   });
   
   describe('handling a request without a body, but no username and password', function() {
-    var strategy = new Strategy(function(username, password, done) {
+    var strategy = new Strategy(function(username, password, secretKey, done) {
       throw new Error('should not be called');
     });
     
@@ -127,13 +129,13 @@ describe('Strategy', function() {
     
     it('should fail with info and status', function() {
       expect(info).to.be.an.object;
-      expect(info.message).to.equal('Missing credentials');
+      expect(info.message).to.equal('Missing credentials or secret key');
       expect(status).to.equal(400);
     });
   });
   
-  describe('handling a request without a body, but no password', function() {
-    var strategy = new Strategy(function(username, password, done) {
+  describe('handling a request with a body and a user name and a secret key, but no password', function() {
+    var strategy = new Strategy(function(username, password, secretKey, done) {
       throw new Error('should not be called');
     });
     
@@ -149,18 +151,19 @@ describe('Strategy', function() {
         .req(function(req) {
           req.body = {};
           req.body.username = 'johndoe';
+          req.body.secretkey = 'secret key';
         })
         .authenticate();
     });
     
     it('should fail with info and status', function() {
       expect(info).to.be.an.object;
-      expect(info.message).to.equal('Missing credentials');
+      expect(info.message).to.equal('Missing credentials or secret key');
       expect(status).to.equal(400);
     });
   });
   
-  describe('handling a request without a body, but no username', function() {
+  describe('handling a request with a body and a secret key, but no username', function() {
     var strategy = new Strategy(function(username, password, done) {
       throw new Error('should not be called');
     });
@@ -177,13 +180,43 @@ describe('Strategy', function() {
         .req(function(req) {
           req.body = {};
           req.body.password = 'secret';
+          req.body.secretkey = 'secret key';
         })
         .authenticate();
     });
     
     it('should fail with info and status', function() {
       expect(info).to.be.an.object;
-      expect(info.message).to.equal('Missing credentials');
+      expect(info.message).to.equal('Missing credentials or secret key');
+      expect(status).to.equal(400);
+    });
+  });
+
+  describe('handling a request with a body and a password, but no secret key', function() {
+    var strategy = new Strategy(function(username, password, done) {
+      throw new Error('should not be called');
+    });
+    
+    var info, status;
+    
+    before(function(done) {
+      chai.passport(strategy)
+        .fail(function(i, s) {
+          info = i;
+          status = s;
+          done();
+        })
+        .req(function(req) {
+          req.body = {};
+          req.body.username = 'johndoe';
+          req.body.password = 'secret';
+        })
+        .authenticate();
+    });
+    
+    it('should fail with info and status', function() {
+      expect(info).to.be.an.object;
+      expect(info.message).to.equal('Missing credentials or secret key');
       expect(status).to.equal(400);
     });
   });

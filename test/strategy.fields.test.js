@@ -8,8 +8,8 @@ var chai = require('chai')
 describe('Strategy', function() {
     
   describe('handling a request with valid credentials in body using custom field names', function() {
-    var strategy = new Strategy({ usernameField: 'userid', passwordField: 'passwd' }, function(username, password, done) {
-      if (username == 'johndoe' && password == 'secret') {
+    var strategy = new Strategy({ usernameField: 'userid', passwordField: 'passwd', secretKeyField: 'secret' }, function(username, password, secretKey, done) {
+      if (username == 'johndoe' && password == 'secret' && secretKey == 'secret key') {
         return done(null, { id: '1234' }, { scope: 'read' });
       }
       return done(null, false);
@@ -29,6 +29,7 @@ describe('Strategy', function() {
           req.body = {};
           req.body.userid = 'johndoe';
           req.body.passwd = 'secret';
+          req.body.secret = 'secret key';
         })
         .authenticate();
     });
@@ -45,8 +46,8 @@ describe('Strategy', function() {
   });
   
   describe('handling a request with valid credentials in body using custom field names with object notation', function() {
-    var strategy = new Strategy({ usernameField: 'user[username]', passwordField: 'user[password]' }, function(username, password, done) {
-      if (username == 'johndoe' && password == 'secret') {
+    var strategy = new Strategy({ usernameField: 'user[username]', passwordField: 'user[password]', secretKeyField: 'user[secretKey]' }, function(username, password, secretKey, done) {
+      if (username == 'johndoe' && password == 'secret' && secretKey == 'secret key') {
         return done(null, { id: '1234' }, { scope: 'read' });
       }
       return done(null, false);
@@ -67,6 +68,7 @@ describe('Strategy', function() {
           req.body.user = {};
           req.body.user.username = 'johndoe';
           req.body.user.password = 'secret';
+          req.body.user.secretKey = 'secret key';
         })
         .authenticate();
     });

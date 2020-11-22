@@ -1,5 +1,4 @@
 /* global describe, it, expect */
-
 var strategy = require('..');
 
 describe('passport-local', function() {
